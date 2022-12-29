@@ -1,5 +1,6 @@
 import re
 import os
+import wget
 
 path = os.path.join(os.getcwd(), 'wiki_test')
 
