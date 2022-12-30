@@ -1,34 +1,44 @@
 import os
 import re
+import wikipediaapi
 
-path = os.path.join(os.getcwd(), 'wiki_test/')
-file_ending = '.html.reduced'
+wiki = wikipediaapi.Wikipedia('en')
 
-start = 'Fly'
-dest = 'Silk'
+def get_links(links):
+    out = []
+    for title in sorted(links.keys()):
+        out.append(re.sub(" \(id: ??.*", "", str(links[title])))
 
-visited = []
-queue = []
+    return out
 
-visited.append(start)
-queue.append(start)
+def sub_links(links, dest):
+    visited = []
+    for page in links:
+        sub_page = wiki.page(page)
+        print(sub_page.title)
+        visited.append(sub_page.title)
+        if sub_page.title == dest:
+            return visited
+            
 
-while queue:
-    m = queue.pop(0).strip('\n')
-    print(m, end=' ')
-    
-    try:
-        with open(path + m + file_ending, 'r') as file:
-            data = file.readlines()
-            for item in data:
-                if item not in visited:
-                    visited.append(item)
-                    queue.append(item)
-    except:
-        continue
+        sub_links = get_links(sub_page.links)
+        for item in sub_links:
+            if item == dest:
+                visited.append(item)
+                return visited
+            if item not in visited:
+                visited.append(item)
+                print('\t' + item)
+    return visited
 
 
+start = 'Odense'
+dest = 'FaZe Clan'
+
+start_page = wiki.page(start)
+
+links = get_links(start_page.links)
 
 
-    
-
+# where things might get hairy
+print(dest in sub_links(links, dest))
