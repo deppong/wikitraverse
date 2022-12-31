@@ -4,7 +4,7 @@ import wikipediaapi
 
 wiki = wikipediaapi.Wikipedia('en')
 
-def get_links(links):
+def parse_links(links):
     out = []
     for title in sorted(links.keys()):
         out.append(re.sub(" \(id: ??.*", "", str(links[title])))
@@ -14,14 +14,16 @@ def get_links(links):
 def sub_links(links, dest):
     visited = []
     for page in links:
+        # get the sub page
         sub_page = wiki.page(page)
         print(sub_page.title)
         visited.append(sub_page.title)
+        # if it's the destination we are done!
         if sub_page.title == dest:
             return visited
             
 
-        sub_links = get_links(sub_page.links)
+        sub_links = parse_links(sub_page.links)
         for item in sub_links:
             if item == dest:
                 visited.append(item)
@@ -37,8 +39,7 @@ dest = 'FaZe Clan'
 
 start_page = wiki.page(start)
 
-links = get_links(start_page.links)
-
+links = parse_links(start_page.links)
 
 # where things might get hairy
 print(dest in sub_links(links, dest))
